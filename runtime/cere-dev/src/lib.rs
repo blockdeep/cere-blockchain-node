@@ -92,7 +92,7 @@ use sp_runtime::{
 	curve::PiecewiseLinear,
 	generic, impl_opaque_keys,
 	traits::{
-		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
+		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, Convert, ConvertInto,
 		Identity as IdentityConvert, NumberFor, OpaqueKeys, SaturatedConversion, StaticLookup,
 	},
 	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
@@ -634,7 +634,6 @@ parameter_types! {
 
 	// signed config
 	pub const SignedRewardBase: Balance = DOLLARS;
-	pub const SignedDepositBase: Balance = DOLLARS;
 	pub const SignedDepositByte: Balance = CENTS;
 
 	pub BetterUnsignedThreshold: Perbill = Perbill::from_rational(1u32, 10_000);
@@ -750,6 +749,16 @@ impl pallet_election_provider_multi_phase::MinerConfig for Runtime {
 	}
 }
 
+/// Returning a fixed value to respect the initial logic.
+/// This could depend on the lenght of the solution.
+/// TODO: Validate.
+pub struct FixedSignedDepositBase;
+impl Convert<usize, u128> for FixedSignedDepositBase {
+	fn convert(_: usize) -> u128 {
+		DOLLARS as u128
+	}
+}
+
 impl pallet_election_provider_multi_phase::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
@@ -762,7 +771,7 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type MinerTxPriority = MultiPhaseUnsignedPriority;
 	type SignedMaxSubmissions = ConstU32<10>;
 	type SignedRewardBase = SignedRewardBase;
-	type SignedDepositBase = ();
+	type SignedDepositBase = FixedSignedDepositBase;
 	type SignedDepositByte = SignedDepositByte;
 	type SignedMaxRefunds = ConstU32<3>;
 	type SignedDepositWeight = ();
