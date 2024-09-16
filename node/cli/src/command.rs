@@ -159,9 +159,10 @@ pub fn run() -> sc_cli::Result<()> {
 					unwrap_client!(client, cmd.run(client.clone()))
 				}),
 				#[cfg(not(feature = "runtime-benchmarks"))]
-				BenchmarkCmd::Storage(_) =>
+				BenchmarkCmd::Storage(_) => {
 					Err("Storage benchmarking can be enabled with `--features runtime-benchmarks`."
-						.into()),
+						.into())
+				},
 				#[cfg(feature = "runtime-benchmarks")]
 				BenchmarkCmd::Storage(cmd) => runner.sync_run(|config| {
 					let (client, backend, _, _) = cere_service::new_chain_ops(&config)?;
@@ -177,8 +178,9 @@ pub fn run() -> sc_cli::Result<()> {
 					print!("BenchmarkCmd::Extrinsic is not supported");
 					unimplemented!()
 				},
-				BenchmarkCmd::Machine(cmd) =>
-					runner.sync_run(|config| cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone())),
+				BenchmarkCmd::Machine(cmd) => {
+					runner.sync_run(|config| cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone()))
+				},
 			}
 		},
 		#[cfg(feature = "try-runtime")]

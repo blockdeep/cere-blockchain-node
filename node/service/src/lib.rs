@@ -397,6 +397,7 @@ where
 			import_queue,
 			block_announce_validator_builder: None,
 			warp_sync_params: Some(WarpSyncParams::WithProvider(warp_sync)),
+			block_relay: None,
 		})?;
 
 	if config.offchain_worker.enabled {
@@ -658,9 +659,9 @@ pub trait IdentifyVariant {
 
 impl IdentifyVariant for Box<dyn sc_service::ChainSpec> {
 	fn is_cere(&self) -> bool {
-		self.id().starts_with("cere_mainnet") ||
-			self.id().starts_with("cere_qanet") ||
-			self.id().starts_with("cere_testnet")
+		self.id().starts_with("cere_mainnet")
+			|| self.id().starts_with("cere_qanet")
+			|| self.id().starts_with("cere_testnet")
 	}
 	fn is_cere_dev(&self) -> bool {
 		// Works for "cere-devnet" and "dev" arms in the load_spec(...) call.
