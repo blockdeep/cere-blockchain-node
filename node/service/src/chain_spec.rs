@@ -102,7 +102,6 @@ fn cere_dev_session_keys(
 /// Helper function to create Cere Dev `RuntimeGenesisConfig` for testing
 #[cfg(feature = "cere-dev-native")]
 pub fn cere_dev_genesis(
-	wasm_binary: &[u8],
 	initial_authorities: Vec<(
 		AccountId,
 		AccountId,
@@ -245,9 +244,8 @@ pub fn cere_dev_native_chain_spec_properties() -> serde_json::map::Map<String, s
 
 /// Helper function to create Cere `RuntimeGenesisConfig` for testing
 #[cfg(feature = "cere-dev-native")]
-fn cere_dev_config_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesisConfig {
+fn cere_dev_config_genesis() -> cere_dev::RuntimeGenesisConfig {
 	cere_dev_genesis(
-		wasm_binary,
 		// Initial authorities
 		vec![authority_keys_from_seed("Alice")],
 		// Initial nominators
@@ -268,11 +266,12 @@ fn cere_dev_config_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesisConfig
 pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
+	#[allow(deprecated)]
 	Ok(CereDevChainSpec::from_genesis(
 		"Development",
 		"cere_dev",
 		ChainType::Development,
-		move || cere_dev_config_genesis(wasm_binary),
+		move || cere_dev_config_genesis(),
 		vec![],
 		None,
 		Some(DEFAULT_PROTOCOL_ID),
@@ -282,13 +281,13 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 		wasm_binary,
 	))
 
+	//TODO: Migrate to builder
 	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
 #[cfg(feature = "cere-dev-native")]
-fn cere_dev_local_testnet_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesisConfig {
+fn cere_dev_local_testnet_genesis() -> cere_dev::RuntimeGenesisConfig {
 	cere_dev_genesis(
-		wasm_binary,
 		// Initial authorities
 		vec![
 			authority_keys_from_seed("Alice"),
@@ -313,11 +312,12 @@ fn cere_dev_local_testnet_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesi
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
+	#[allow(deprecated)]
 	Ok(CereDevChainSpec::from_genesis(
 		"Local Testnet",
 		"cere_dev_local_testnet",
 		ChainType::Local,
-		move || cere_dev_local_testnet_genesis(wasm_binary),
+		move || cere_dev_local_testnet_genesis(),
 		vec![],
 		None,
 		Some(DEFAULT_PROTOCOL_ID),
@@ -327,6 +327,7 @@ pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 		wasm_binary,
 	))
 
+	//TODO: Migrate to builder
 	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
