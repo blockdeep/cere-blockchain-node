@@ -166,11 +166,8 @@ pub fn cere_dev_genesis(
 	const STASH: Balance = ENDOWMENT / 1000;
 
 	cere_dev::RuntimeGenesisConfig {
-		system: cere_dev::SystemConfig {
-			// Add Wasm runtime to storage.
-			code: wasm_binary.to_vec(),
-			..Default::default()
-		},
+		//TODO: check
+		system: cere_dev::SystemConfig::default(),
 		balances: cere_dev::BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
 			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
@@ -271,18 +268,20 @@ fn cere_dev_config_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesisConfig
 pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	Ok(CereDevChainSpec::from_genesis(
-		"Development",
-		"cere_dev",
-		ChainType::Development,
-		move || cere_dev_config_genesis(wasm_binary),
-		vec![],
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		Some(cere_dev_native_chain_spec_properties()),
-		Default::default(),
-	))
+	// Ok(CereDevChainSpec::from_genesis(
+	// 	"Development",
+	// 	"cere_dev",
+	// 	ChainType::Development,
+	// 	move || cere_dev_config_genesis(wasm_binary),
+	// 	vec![],
+	// 	None,
+	// 	Some(DEFAULT_PROTOCOL_ID),
+	// 	None,
+	// 	Some(cere_dev_native_chain_spec_properties()),
+	// 	Default::default(),
+	// ))
+
+	Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
 #[cfg(feature = "cere-dev-native")]
@@ -313,18 +312,20 @@ fn cere_dev_local_testnet_genesis(wasm_binary: &[u8]) -> cere_dev::RuntimeGenesi
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	Ok(CereDevChainSpec::from_genesis(
-		"Local Testnet",
-		"cere_dev_local_testnet",
-		ChainType::Local,
-		move || cere_dev_local_testnet_genesis(wasm_binary),
-		vec![],
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		None,
-		Default::default(),
-	))
+	// Ok(CereDevChainSpec::from_genesis(
+	// 	"Local Testnet",
+	// 	"cere_dev_local_testnet",
+	// 	ChainType::Local,
+	// 	move || cere_dev_local_testnet_genesis(wasm_binary),
+	// 	vec![],
+	// 	None,
+	// 	Some(DEFAULT_PROTOCOL_ID),
+	// 	None,
+	// 	None,
+	// 	Default::default(),
+	// ))
+
+	Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
 pub fn cere_mainnet_config() -> Result<CereChainSpec, String> {
