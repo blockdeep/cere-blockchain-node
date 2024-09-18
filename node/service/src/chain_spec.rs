@@ -162,13 +162,8 @@ pub fn cere_dev_genesis(
 		.collect::<Vec<_>>();
 
 	// TODO: check the values
-	const ENDOWMENT: Balance = 10_000_000 * TEST_UNITS;
+	const ENDOWMENT: Balance = 1_000_000_000 * TEST_UNITS;
 	const STASH: Balance = ENDOWMENT / 1000;
-
-	// Configure endowed accounts with initial balance of 1 << 60.
-
-	// let balances: Vec<(sp_runtime::AccountId32, Balance)> = endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
-	// 	.collect::<Vec<_>>();
 
 	serde_json::json!({
 		//TODO: check
@@ -203,7 +198,6 @@ pub fn cere_dev_genesis(
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
 			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
-			// ..Default::default()
 		},
 		// ddc_staking: cere_dev::DdcStakingConfig::default(),
 		"sudo": { "key": Some(root_key) },
