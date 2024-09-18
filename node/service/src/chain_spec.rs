@@ -214,7 +214,11 @@ pub fn cere_dev_genesis(
 		// vesting: Default::default(),
 		// transaction_payment: Default::default(),
 		// ddc_customers: Default::default(),
-		// nomination_pools: Default::default(),
+		"nominationPools": {
+			"maxPools": 16,
+			"maxMembersPerPool": 32,
+			"maxMembers": 16 * 32,
+		},
 		// ddc_clusters: Default::default(),
 		// ddc_nodes: Default::default(),
 		// ddc_payouts: Default::default(),
