@@ -246,7 +246,7 @@ pub fn cere_dev_native_chain_spec_properties() -> serde_json::map::Map<String, s
 	.clone()
 }
 
-/// Helper function to create Cere `RuntimeGenesisConfig` for testing
+/// Helper function to create Cere  for testing
 #[cfg(feature = "cere-dev-native")]
 fn cere_dev_config_genesis() -> serde_json::Value {
 	cere_dev_genesis(
@@ -298,7 +298,7 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	//TODO: Migrate to builder
 	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
-/*
+
 #[cfg(feature = "cere-dev-native")]
 fn cere_dev_local_testnet_genesis() -> serde_json::Value {
 	cere_dev_genesis(
@@ -326,20 +326,29 @@ fn cere_dev_local_testnet_genesis() -> serde_json::Value {
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	#[allow(deprecated)]
-	Ok(CereDevChainSpec::from_genesis(
-		"Local Testnet",
-		"cere_dev_local_testnet",
-		ChainType::Local,
-		move || cere_dev_local_testnet_genesis(),
-		vec![],
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		None,
-		Default::default(),
-		wasm_binary,
-	))
+	// #[allow(deprecated)]
+	// Ok(CereDevChainSpec::from_genesis(
+	// 	"Local Testnet",
+	// 	"cere_dev_local_testnet",
+	// 	ChainType::Local,
+	// 	move || cere_dev_local_testnet_genesis(),
+	// 	vec![],
+	// 	None,
+	// 	Some(DEFAULT_PROTOCOL_ID),
+	// 	None,
+	// 	None,
+	// 	Default::default(),
+	// 	wasm_binary,
+	// ))
+	Ok(CereDevChainSpec::builder(
+		cere_dev_runtime::WASM_BINARY.expect("WASM binary was not built, please build it!"),
+		Extensions::default()
+	).with_name("Local Testnet")
+		.with_id("cere_dev_local_testnet")
+		.with_chain_type(ChainType::Development)
+		.with_genesis_config_patch(cere_dev_local_testnet_genesis())
+		.build())
+
 
 	//TODO: Migrate to builder
 	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
@@ -352,8 +361,6 @@ pub fn cere_mainnet_config() -> Result<CereChainSpec, String> {
 pub fn cere_testnet_config() -> Result<CereChainSpec, String> {
 	CereChainSpec::from_json_bytes(&include_bytes!("../chain-specs/testnet.json")[..])
 }
-
- */
 
 pub fn cere_qanet_config() -> Result<CereChainSpec, String> {
 	CereChainSpec::from_json_bytes(&include_bytes!("../chain-specs/qanet.json")[..])
