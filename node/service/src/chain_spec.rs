@@ -289,7 +289,7 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
-		Default::default() // TODO: check if this is correct
+		Extensions::default()
 	).with_name("Development")
 		.with_id("cere_dev")
 		.with_chain_type(ChainType::Development)
@@ -344,7 +344,7 @@ pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	// ))
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
-		Default::default() // TODO: check if this is correct
+		Extensions::default()
 	).with_name("Local Testnet")
 		.with_id("cere_dev_local_testnet")
 		.with_chain_type(ChainType::Local)
