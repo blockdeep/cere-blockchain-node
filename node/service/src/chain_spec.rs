@@ -161,17 +161,21 @@ pub fn cere_dev_genesis(
 		}))
 		.collect::<Vec<_>>();
 
-	const ENDOWMENT: Balance = 10_000_000_000 * TEST_UNITS;
+	// TODO: check the values
+	const ENDOWMENT: Balance = 10_000_000 * TEST_UNITS;
 	const STASH: Balance = ENDOWMENT / 1000;
 
 	// Configure endowed accounts with initial balance of 1 << 60.
-	let balances: Vec<(sp_runtime::AccountId32, Balance)> = endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
-		.collect::<Vec<_>>();
+
+	// let balances: Vec<(sp_runtime::AccountId32, Balance)> = endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
+	// 	.collect::<Vec<_>>();
 
 	serde_json::json!({
 		//TODO: check
+
 		"balances": {
-			"balances": balances
+			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
+		.collect::<Vec<_>>(),
 		},
 		// "indices": { "indices": vec![] },
 
@@ -194,19 +198,17 @@ pub fn cere_dev_genesis(
 				.collect::<Vec<_>>(),
 		},
 		"staking": {
-			"validator_count": initial_authorities.len() as u32,
-			"minimum_validator_count": initial_authorities.len() as u32,
+			"validatorCount": initial_authorities.len() as u32,
+			"minimumValidatorCount": initial_authorities.len() as u32,
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-			"slash_reward_fraction": Perbill::from_percent(10),
+			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
 			// ..Default::default()
 		},
 		// ddc_staking: cere_dev::DdcStakingConfig::default(),
 		"sudo": { "key": Some(root_key) },
-		"babe":{
-			// authorities: Default::default(),
-			"epoch_config": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
-			// ..Default::default()
+		"babe": {
+			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
 		},
 		// "im_online": { "keys": vec![] },
 		// "authority_discovery": {
@@ -222,7 +224,7 @@ pub fn cere_dev_genesis(
 		// ddc_clusters: Default::default(),
 		// ddc_nodes: Default::default(),
 		// ddc_payouts: Default::default(),
-		"tech_comm": {
+		"techComm": {
 			"members": endowed_accounts
 				.iter()
 				.take((endowed_accounts.len() + 1) / 2)
@@ -286,8 +288,8 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	// ))
 
 	Ok(CereDevChainSpec::builder(
-		cere_dev_runtime::WASM_BINARY.expect("WASM binary was not built, please build it!"),
-		Extensions::default()
+		wasm_binary,
+		Default::default() // TODO: check if this is correct
 	).with_name("Development")
 		.with_id("cere_dev")
 		.with_chain_type(ChainType::Development)
@@ -341,11 +343,11 @@ pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	// 	wasm_binary,
 	// ))
 	Ok(CereDevChainSpec::builder(
-		cere_dev_runtime::WASM_BINARY.expect("WASM binary was not built, please build it!"),
-		Extensions::default()
+		wasm_binary,
+		Default::default() // TODO: check if this is correct
 	).with_name("Local Testnet")
 		.with_id("cere_dev_local_testnet")
-		.with_chain_type(ChainType::Development)
+		.with_chain_type(ChainType::Local)
 		.with_genesis_config_patch(cere_dev_local_testnet_genesis())
 		.build())
 
