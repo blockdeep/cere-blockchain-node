@@ -48,7 +48,7 @@ pub type CereChainSpec = DummyChainSpec;
 /// The `ChainSpec` parameterized for the cere-dev runtime.
 #[cfg(feature = "cere-dev-native")]
 pub type CereDevChainSpec =
-sc_service::GenericChainSpec<cere_dev::RuntimeGenesisConfig, Extensions>;
+	sc_service::GenericChainSpec<cere_dev::RuntimeGenesisConfig, Extensions>;
 
 /// The `ChainSpec` parameterized for the cere-dev runtime.
 // Dummy chain spec, but that is fine when we don't have the native runtime.
@@ -66,8 +66,8 @@ type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-	where
-		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -198,9 +198,11 @@ pub fn cere_dev_genesis(
 		"babe": {
 			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
 		},
+		// Assigned the same value as in the default genesis config for transactionPayment.
 		"transactionPayment": {
-          "multiplier": 1_000_000_000_000_000_000u128.to_string(),
-        },
+		  "multiplier": 1_000_000_000_000_000_000u128.to_string(),
+		},
+		// Assigned the same values as in the default genesis config for nominationPools.
 		"nominationPools": {
 			"maxPools": 16,
 			"maxMembersPerPool": 32,
@@ -224,9 +226,9 @@ pub fn cere_dev_native_chain_spec_properties() -> serde_json::map::Map<String, s
 		"tokenSymbol": "CERE",
 		"ss58Format": 54,
 	})
-		.as_object()
-		.expect("Map given; qed")
-		.clone()
+	.as_object()
+	.expect("Map given; qed")
+	.clone()
 }
 
 /// Helper function to create Cere  for testing
@@ -253,17 +255,14 @@ fn cere_dev_config_genesis() -> serde_json::Value {
 pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	Ok(CereDevChainSpec::builder(
-		wasm_binary,
-		Default::default()
-	).with_name("Development")
+	Ok(CereDevChainSpec::builder(wasm_binary, Default::default())
+		.with_name("Development")
 		.with_id("cere_dev")
 		.with_chain_type(ChainType::Development)
 		.with_genesis_config_patch(cere_dev_config_genesis())
 		.with_protocol_id(DEFAULT_PROTOCOL_ID)
 		.with_properties(cere_dev_native_chain_spec_properties())
 		.build())
-
 }
 
 #[cfg(feature = "cere-dev-native")]
@@ -293,16 +292,13 @@ fn cere_dev_local_testnet_genesis() -> serde_json::Value {
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	Ok(CereDevChainSpec::builder(
-		wasm_binary,
-		Default::default()
-	).with_name("Local Testnet")
+	Ok(CereDevChainSpec::builder(wasm_binary, Default::default())
+		.with_name("Local Testnet")
 		.with_id("cere_dev_local_testnet")
 		.with_chain_type(ChainType::Local)
 		.with_genesis_config_patch(cere_dev_local_testnet_genesis())
 		.with_protocol_id(DEFAULT_PROTOCOL_ID)
 		.build())
-
 }
 
 pub fn cere_mainnet_config() -> Result<CereChainSpec, String> {
