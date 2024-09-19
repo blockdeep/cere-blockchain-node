@@ -161,19 +161,14 @@ pub fn cere_dev_genesis(
 		}))
 		.collect::<Vec<_>>();
 
-	// TODO: check the values
 	const ENDOWMENT: Balance = 10_000_000_000 * TEST_UNITS;
 	const STASH: Balance = ENDOWMENT / 1000;
 
 	serde_json::json!({
-		//TODO: check
-
 		"balances": {
 			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
 		.collect::<Vec<_>>(),
 		},
-		// "indices": { "indices": vec![] },
-
 		"session": {
 			"keys": initial_authorities
 				.iter()
@@ -199,7 +194,6 @@ pub fn cere_dev_genesis(
 			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
 		},
-		// ddc_staking: cere_dev::DdcStakingConfig::default(),
 		"sudo": { "key": Some(root_key) },
 		"babe": {
 			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
@@ -207,30 +201,17 @@ pub fn cere_dev_genesis(
 		"transactionPayment": {
           "multiplier": 1_000_000_000_000_000_000u128.to_string(),
         },
-		// "im_online": { "keys": vec![] },
-		// "authority_discovery": {
-		// 	"keys": vec![],
-		// 	// ..Default::default()
-		// },
-		// grandpa: Default::default(),
-		// treasury: Default::default(),
-		// vesting: Default::default(),
-		// ddc_customers: Default::default(),
 		"nominationPools": {
 			"maxPools": 16,
 			"maxMembersPerPool": 32,
 			"maxMembers": 16 * 32,
 		},
-		// ddc_clusters: Default::default(),
-		// ddc_nodes: Default::default(),
-		// ddc_payouts: Default::default(),
 		"techComm": {
 			"members": endowed_accounts
 				.iter()
 				.take((endowed_accounts.len() + 1) / 2)
 				.cloned()
 				.collect::<Vec<_>>(),
-			// phantom: Default::default(),
 		},
 
 	})
@@ -272,21 +253,6 @@ fn cere_dev_config_genesis() -> serde_json::Value {
 pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	// #[allow(deprecated)]
-	// Ok(CereDevChainSpec::from_genesis(
-	// 	"Development",
-	// 	"cere_dev",
-	// 	ChainType::Development,
-	// 	move || cere_dev_config_genesis(),
-	// 	vec![],
-	// 	None,
-	// 	Some(DEFAULT_PROTOCOL_ID),
-	// 	None,
-	// 	Some(cere_dev_native_chain_spec_properties()),
-	// 	Default::default(),
-	// 	wasm_binary,
-	// ))
-
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
 		Default::default()
@@ -298,8 +264,6 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 		.with_properties(cere_dev_native_chain_spec_properties())
 		.build())
 
-	//TODO: Migrate to builder
-	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
 #[cfg(feature = "cere-dev-native")]
@@ -329,20 +293,6 @@ fn cere_dev_local_testnet_genesis() -> serde_json::Value {
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	// #[allow(deprecated)]
-	// Ok(CereDevChainSpec::from_genesis(
-	// 	"Local Testnet",
-	// 	"cere_dev_local_testnet",
-	// 	ChainType::Local,
-	// 	move || cere_dev_local_testnet_genesis(),
-	// 	vec![],
-	// 	None,
-	// 	Some(DEFAULT_PROTOCOL_ID),
-	// 	None,
-	// 	None,
-	// 	Default::default(),
-	// 	wasm_binary,
-	// ))
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
 		Default::default()
@@ -353,9 +303,6 @@ pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 		.with_protocol_id(DEFAULT_PROTOCOL_ID)
 		.build())
 
-
-	//TODO: Migrate to builder
-	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
 }
 
 pub fn cere_mainnet_config() -> Result<CereChainSpec, String> {
