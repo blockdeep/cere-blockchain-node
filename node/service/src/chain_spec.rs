@@ -204,6 +204,9 @@ pub fn cere_dev_genesis(
 		"babe": {
 			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
 		},
+		"transactionPayment": {
+          "multiplier": 1_000_000_000_000_000_000u128.to_string(),
+        },
 		// "im_online": { "keys": vec![] },
 		// "authority_discovery": {
 		// 	"keys": vec![],
@@ -212,7 +215,6 @@ pub fn cere_dev_genesis(
 		// grandpa: Default::default(),
 		// treasury: Default::default(),
 		// vesting: Default::default(),
-		// transaction_payment: Default::default(),
 		// ddc_customers: Default::default(),
 		"nominationPools": {
 			"maxPools": 16,
@@ -287,11 +289,12 @@ pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
-		Extensions::default()
+		Default::default()
 	).with_name("Development")
 		.with_id("cere_dev")
 		.with_chain_type(ChainType::Development)
 		.with_genesis_config_patch(cere_dev_config_genesis())
+		.with_protocol_id(DEFAULT_PROTOCOL_ID)
 		.with_properties(cere_dev_native_chain_spec_properties())
 		.build())
 
@@ -342,11 +345,12 @@ pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	// ))
 	Ok(CereDevChainSpec::builder(
 		wasm_binary,
-		Extensions::default()
+		Default::default()
 	).with_name("Local Testnet")
 		.with_id("cere_dev_local_testnet")
 		.with_chain_type(ChainType::Local)
 		.with_genesis_config_patch(cere_dev_local_testnet_genesis())
+		.with_protocol_id(DEFAULT_PROTOCOL_ID)
 		.build())
 
 
