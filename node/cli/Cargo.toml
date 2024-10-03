@@ -50,7 +50,7 @@ cli = [
   "frame-benchmarking-cli",
   "try-runtime-cli",
   "cere-client",
-	"sp-runtime/std",
+  "sp-runtime/std",
 ]
 runtime-benchmarks = ["cere-service/runtime-benchmarks"]
 try-runtime = ["cere-service/try-runtime", "try-runtime-cli/try-runtime"]
