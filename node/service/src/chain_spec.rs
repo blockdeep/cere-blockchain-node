@@ -204,6 +204,8 @@ pub fn cere_dev_genesis(
 		},
 		// Assigned the same values as in the default genesis config for nominationPools.
 		"nominationPools": {
+			"minJoinBond":0,
+			"minCreateBond": 0,
 			"maxPools": 16,
 			"maxMembersPerPool": 32,
 			"maxMembers": 16 * 32,
