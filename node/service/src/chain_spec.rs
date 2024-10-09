@@ -99,7 +99,7 @@ fn cere_dev_session_keys(
 	cere_dev::SessionKeys { grandpa, babe, im_online, authority_discovery, ddc_verification }
 }
 
-/// Helper function to create Cere Dev `RuntimeGenesisConfig` for testing
+/// Helper function to create Cere Dev for testing
 #[cfg(feature = "cere-dev-native")]
 pub fn cere_dev_genesis(
 	initial_authorities: Vec<(
@@ -114,7 +114,7 @@ pub fn cere_dev_genesis(
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-) -> cere_dev::RuntimeGenesisConfig {
+) -> serde_json::Value {
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -164,16 +164,15 @@ pub fn cere_dev_genesis(
 	const ENDOWMENT: Balance = 10_000_000_000 * TEST_UNITS;
 	const STASH: Balance = ENDOWMENT / 1000;
 
-	cere_dev::RuntimeGenesisConfig {
-		//TODO: check
-		system: cere_dev::SystemConfig::default(),
-		balances: cere_dev::BalancesConfig {
-			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
+	serde_json::json!({
+		"system": { },
+		"balances": {
+			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
+		.collect::<Vec<_>>(),
 		},
-		indices: cere_dev::IndicesConfig { indices: vec![] },
-		session: cere_dev::SessionConfig {
-			keys: initial_authorities
+		"indices": cere_dev::IndicesConfig { indices: vec![] },
+		"session": {
+			"keys": initial_authorities
 				.iter()
 				.map(|x| {
 					(
@@ -190,44 +189,76 @@ pub fn cere_dev_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-		staking: cere_dev::StakingConfig {
-			validator_count: initial_authorities.len() as u32,
-			minimum_validator_count: initial_authorities.len() as u32,
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
-			stakers,
-			..Default::default()
+		"grandpa": {
+			"authorities": []
 		},
-		ddc_staking: cere_dev::DdcStakingConfig::default(),
-		sudo: cere_dev::SudoConfig { key: Some(root_key) },
-		babe: cere_dev::BabeConfig {
-			authorities: Default::default(),
-			epoch_config: Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
-			..Default::default()
+		"staking": {
+			"validatorCount": initial_authorities.len() as u32,
+			"minimumValidatorCount": initial_authorities.len() as u32,
+			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+			"forceEra": "NotForcing",
+			"slashRewardFraction": Perbill::from_percent(10),
+			"canceledPayout": 0,
+			"stakers": stakers.clone(),
+			"minNominatorBond": 0,
+          	"minValidatorBond": 0,
+          	"maxValidatorCount": null,
+          	"maxNominatorCount": null,
 		},
-		im_online: cere_dev::ImOnlineConfig { keys: vec![] },
-		authority_discovery: cere_dev::AuthorityDiscoveryConfig {
-			keys: vec![],
-			..Default::default()
+		"ddcStaking": cere_dev::DdcStakingConfig {
+			storages: vec![],
+          	clusters: vec![]
 		},
-		grandpa: Default::default(),
-		treasury: Default::default(),
-		vesting: Default::default(),
-		transaction_payment: Default::default(),
-		ddc_customers: Default::default(),
-		nomination_pools: Default::default(),
-		ddc_clusters: Default::default(),
-		ddc_nodes: Default::default(),
-		ddc_payouts: Default::default(),
-		tech_comm: cere_dev::TechCommConfig {
-			members: endowed_accounts
+		 "ddcCustomers": {
+          "feederAccount": null,
+          "buckets": []
+        },
+		"ddcNodes": {
+          "storageNodes": []
+        },
+		"ddcClusters": {
+          "clusters": [],
+          "clustersProtocolParams": [],
+          "clustersNodes": []
+        },
+		"ddcPayouts": {
+          "feederAccount": null,
+          "authorisedCaller": null,
+          "debtorCustomers": []
+        },
+		"sudo": { "key": Some(root_key) },
+		"babe": {
+			"authorities": [],
+			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
+		},
+		"imOnline": cere_dev::ImOnlineConfig { keys: vec![] },
+		"authorityDiscovery": {
+			"keys": []
+		},
+		"vesting": {
+			"vesting": []
+		},
+		"treasury": { },
+		// Assigned the same value as in the default genesis config for transactionPayment.
+		"transactionPayment": {
+		  "multiplier": 1_000_000_000_000_000_000u128.to_string(),
+		},
+		// Assigned the same values as in the default genesis config for nominationPools.
+		"nominationPools": {
+			"minJoinBond":0,
+			"minCreateBond": 0,
+			"maxPools": 16,
+			"maxMembersPerPool": 32,
+			"maxMembers": 16 * 32,
+		},
+		"techComm": {
+			"members": endowed_accounts
 				.iter()
 				.take((endowed_accounts.len() + 1) / 2)
 				.cloned()
-				.collect(),
-			phantom: Default::default(),
+				.collect::<Vec<_>>(),
 		},
-	}
+	})
 }
 
 /// Returns the properties for the [`cere-dev-native`].
@@ -242,9 +273,9 @@ pub fn cere_dev_native_chain_spec_properties() -> serde_json::map::Map<String, s
 	.clone()
 }
 
-/// Helper function to create Cere `RuntimeGenesisConfig` for testing
+/// Helper function to create Cere  for testing
 #[cfg(feature = "cere-dev-native")]
-fn cere_dev_config_genesis() -> cere_dev::RuntimeGenesisConfig {
+fn cere_dev_config_genesis() -> serde_json::Value {
 	cere_dev_genesis(
 		// Initial authorities
 		vec![authority_keys_from_seed("Alice")],
@@ -266,27 +297,18 @@ fn cere_dev_config_genesis() -> cere_dev::RuntimeGenesisConfig {
 pub fn cere_dev_development_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	#[allow(deprecated)]
-	Ok(CereDevChainSpec::from_genesis(
-		"Development",
-		"cere_dev",
-		ChainType::Development,
-		move || cere_dev_config_genesis(),
-		vec![],
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		Some(cere_dev_native_chain_spec_properties()),
-		Default::default(),
-		wasm_binary,
-	))
-
-	//TODO: Migrate to builder
-	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
+	Ok(CereDevChainSpec::builder(wasm_binary, Default::default())
+		.with_name("Development")
+		.with_id("cere_dev")
+		.with_chain_type(ChainType::Development)
+		.with_genesis_config_patch(cere_dev_config_genesis())
+		.with_protocol_id(DEFAULT_PROTOCOL_ID)
+		.with_properties(cere_dev_native_chain_spec_properties())
+		.build())
 }
 
 #[cfg(feature = "cere-dev-native")]
-fn cere_dev_local_testnet_genesis() -> cere_dev::RuntimeGenesisConfig {
+fn cere_dev_local_testnet_genesis() -> serde_json::Value {
 	cere_dev_genesis(
 		// Initial authorities
 		vec![
@@ -312,23 +334,13 @@ fn cere_dev_local_testnet_genesis() -> cere_dev::RuntimeGenesisConfig {
 pub fn cere_dev_local_testnet_config() -> Result<CereDevChainSpec, String> {
 	let wasm_binary = cere_dev::WASM_BINARY.ok_or("Cere Dev development wasm not available")?;
 
-	#[allow(deprecated)]
-	Ok(CereDevChainSpec::from_genesis(
-		"Local Testnet",
-		"cere_dev_local_testnet",
-		ChainType::Local,
-		move || cere_dev_local_testnet_genesis(),
-		vec![],
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		None,
-		Default::default(),
-		wasm_binary,
-	))
-
-	//TODO: Migrate to builder
-	// Ok(CereDevChainSpec::builder(wasm_binary, Extensions::default()).build())
+	Ok(CereDevChainSpec::builder(wasm_binary, Default::default())
+		.with_name("Local Testnet")
+		.with_id("cere_dev_local_testnet")
+		.with_chain_type(ChainType::Local)
+		.with_genesis_config_patch(cere_dev_local_testnet_genesis())
+		.with_protocol_id(DEFAULT_PROTOCOL_ID)
+		.build())
 }
 
 pub fn cere_mainnet_config() -> Result<CereChainSpec, String> {
