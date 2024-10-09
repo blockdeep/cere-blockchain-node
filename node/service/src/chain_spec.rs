@@ -165,10 +165,12 @@ pub fn cere_dev_genesis(
 	const STASH: Balance = ENDOWMENT / 1000;
 
 	serde_json::json!({
+		"system": { },
 		"balances": {
 			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT))
 		.collect::<Vec<_>>(),
 		},
+		"indices": cere_dev::IndicesConfig { indices: vec![] },
 		"session": {
 			"keys": initial_authorities
 				.iter()
@@ -187,17 +189,56 @@ pub fn cere_dev_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
+		"grandpa": {
+			"authorities": []
+		},
 		"staking": {
 			"validatorCount": initial_authorities.len() as u32,
 			"minimumValidatorCount": initial_authorities.len() as u32,
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+			"forceEra": "NotForcing",
 			"slashRewardFraction": Perbill::from_percent(10),
+			"canceledPayout": 0,
 			"stakers": stakers.clone(),
+			"minNominatorBond": 0,
+          	"minValidatorBond": 0,
+          	"maxValidatorCount": null,
+          	"maxNominatorCount": null,
 		},
+		"ddcStaking": cere_dev::DdcStakingConfig {
+			storages: vec![],
+          	clusters: vec![]
+		},
+		 "ddcCustomers": {
+          "feederAccount": null,
+          "buckets": []
+        },
+		"ddcNodes": {
+          "storageNodes": []
+        },
+		"ddcClusters": {
+          "clusters": [],
+          "clustersProtocolParams": [],
+          "clustersNodes": []
+        },
+		"ddcPayouts": {
+          "feederAccount": null,
+          "authorisedCaller": null,
+          "debtorCustomers": []
+        },
 		"sudo": { "key": Some(root_key) },
 		"babe": {
+			"authorities": [],
 			"epochConfig": Some(cere_dev::BABE_GENESIS_EPOCH_CONFIG),
 		},
+		"imOnline": cere_dev::ImOnlineConfig { keys: vec![] },
+		"authorityDiscovery": {
+			"keys": []
+		},
+		"vesting": {
+			"vesting": []
+		},
+		"treasury": { },
 		// Assigned the same value as in the default genesis config for transactionPayment.
 		"transactionPayment": {
 		  "multiplier": 1_000_000_000_000_000_000u128.to_string(),
@@ -217,7 +258,6 @@ pub fn cere_dev_genesis(
 				.cloned()
 				.collect::<Vec<_>>(),
 		},
-
 	})
 }
 
