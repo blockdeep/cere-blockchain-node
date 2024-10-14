@@ -29,6 +29,7 @@ use frame_election_provider_support::{
 use frame_support::{
 	construct_runtime, derive_impl,
 	dispatch::DispatchClass,
+	genesis_builder_helper::{build_config, create_default_config},
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
@@ -310,20 +311,20 @@ impl InstanceFilter<RuntimeCall> for ProxyType {
 			ProxyType::Any => true,
 			ProxyType::NonTransfer => !matches!(
 				c,
-				RuntimeCall::Balances(..) |
-					RuntimeCall::Vesting(pallet_vesting::Call::vested_transfer { .. }) |
-					RuntimeCall::Indices(pallet_indices::Call::transfer { .. }) |
-					RuntimeCall::NominationPools(..) |
-					RuntimeCall::ConvictionVoting(..) |
-					RuntimeCall::Referenda(..) |
-					RuntimeCall::Whitelist(..)
+				RuntimeCall::Balances(..)
+					| RuntimeCall::Vesting(pallet_vesting::Call::vested_transfer { .. })
+					| RuntimeCall::Indices(pallet_indices::Call::transfer { .. })
+					| RuntimeCall::NominationPools(..)
+					| RuntimeCall::ConvictionVoting(..)
+					| RuntimeCall::Referenda(..)
+					| RuntimeCall::Whitelist(..)
 			),
 			ProxyType::Governance => matches!(
 				c,
-				RuntimeCall::Treasury(..) |
-					RuntimeCall::ConvictionVoting(..) |
-					RuntimeCall::Referenda(..) |
-					RuntimeCall::Whitelist(..)
+				RuntimeCall::Treasury(..)
+					| RuntimeCall::ConvictionVoting(..)
+					| RuntimeCall::Referenda(..)
+					| RuntimeCall::Whitelist(..)
 			),
 			ProxyType::Staking => matches!(c, RuntimeCall::Staking(..)),
 		}
@@ -671,8 +672,8 @@ impl Get<Option<BalancingConfig>> for OffchainRandomBalancing {
 			max => {
 				let seed = sp_io::offchain::random_seed();
 				let random = <u32>::decode(&mut TrailingZeroInput::new(&seed))
-					.expect("input is padded with zeroes; qed") %
-					max.saturating_add(1);
+					.expect("input is padded with zeroes; qed")
+					% max.saturating_add(1);
 				random as usize
 			},
 		};
@@ -1468,6 +1469,16 @@ mod benches {
 }
 
 impl_runtime_apis! {
+	impl sp_genesis_builder::GenesisBuilder<Block> for Runtime {
+		fn create_default_config() -> Vec<u8> {
+			create_default_config::<RuntimeGenesisConfig>()
+		}
+
+		fn build_config(config: Vec<u8>) -> sp_genesis_builder::Result {
+			build_config::<RuntimeGenesisConfig>(config)
+		}
+	}
+
 	impl sp_api::Core<Block> for Runtime {
 		fn version() -> RuntimeVersion {
 			VERSION
