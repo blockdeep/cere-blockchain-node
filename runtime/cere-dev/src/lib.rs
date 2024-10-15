@@ -30,6 +30,7 @@ use frame_election_provider_support::{
 use frame_support::{
 	construct_runtime, derive_impl,
 	dispatch::DispatchClass,
+	genesis_builder_helper::{build_state, get_preset},
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
@@ -147,7 +148,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 61000,
+	spec_version: 63000,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 18,
@@ -900,7 +901,7 @@ impl pallet_contracts::Config for Runtime {
 	type InstantiateOrigin = EnsureSigned<Self::AccountId>;
 	type Debug = ();
 	type Environment = ();
-	type Migrations = ();
+	type Migrations = (pallet_contracts::migration::v16::Migration<Runtime>,);
 	type ApiVersion = ();
 	type Xcm = ();
 }
@@ -1393,6 +1394,8 @@ type Migrations = (
 	pallet_nomination_pools::migration::versioned::V7ToV8<Runtime>,
 	pallet_staking::migrations::v14::MigrateToV14<Runtime>,
 	pallet_grandpa::migrations::MigrateV4ToV5<Runtime>,
+	pallet_staking::migrations::v15::MigrateV14ToV15<Runtime>,
+	pallet_contracts::Migration<Runtime>,
 	pallet_identity::migration::versioned::V0ToV1<Runtime, IDENTITY_MIGRATION_KEY_LIMIT>,
 );
 
@@ -1459,6 +1462,20 @@ mod benches {
 }
 
 impl_runtime_apis! {
+	impl sp_genesis_builder::GenesisBuilder<Block> for Runtime {
+		fn build_state(config: Vec<u8>) -> sp_genesis_builder::Result {
+			build_state::<RuntimeGenesisConfig>(config)
+		}
+
+		fn get_preset(id: &Option<sp_genesis_builder::PresetId>) -> Option<Vec<u8>> {
+			get_preset::<RuntimeGenesisConfig>(id, |_| None)
+		}
+
+		fn preset_names() -> Vec<sp_genesis_builder::PresetId> {
+			vec![]
+		}
+	}
+
 	impl sp_api::Core<Block> for Runtime {
 		fn version() -> RuntimeVersion {
 			VERSION
